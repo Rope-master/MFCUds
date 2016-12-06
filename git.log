@@ -1,0 +1,79 @@
+commit 402298aac659d92e663468a049f0bfdd878174dd
+Author: vmwell-h <vmwell@hotmail.com>
+Date:   Tue Dec 6 13:58:30 2016 +0800
+
+    Modified in hangzhou
+    1. indicator_opt add Serial NU. to all option
+    2. Fix bug when shift LampPos
+    3. Fix a bug in netowrk_send_udsmsg()
+    4. Some modified in OnBnClickedBtOpendev()
+    5. Add a data to rwdata_list
+
+commit 5a1046ac1f4e795ad5d791ed7564d8b156decb15
+Author: vmwell-h <vmwell@hotmail.com>
+Date:   Mon Dec 5 09:51:17 2016 +0800
+
+    1.Add extend session request before mcu reset
+    2.Move extend session in EmWr
+
+commit 2a473de90f82b9e16f19f26a9de3133f97932100
+Author: vmwell-h <vmwell@hotmail.com>
+Date:   Mon Nov 7 11:43:18 2016 +0800
+
+    Delete ipch and .db
+
+commit d20a819901c8eced4076e7699d5ce5be45071e01
+Author: vmwell-h <vmwell@hotmail.com>
+Date:   Mon Nov 7 11:33:10 2016 +0800
+
+    vs project ipch and .db file is too big, ignore it
+
+commit 0550278974efc55a6c14877fc6b5ee9767e0cf4a
+Author: vmwell-h <vmwell@hotmail.com>
+Date:   Mon Nov 7 10:55:34 2016 +0800
+
+    1.  CCanCommDlg::PrintLog add Line Scroll ensure the Edit control display the New logs,
+    2.  Add implementation code of baudrate,
+    3.  Add Network Err flag, and Log the Err in Can Recv Timer.
+    4.  Add some Log print in CMFCUdsTestToolDlg method
+
+commit a043e4f5253b5e0874542fc3224d2ae9617f81bb
+Author: vmwell-h <vmwell@hotmail.com>
+Date:   Fri Nov 4 18:25:01 2016 +0800
+
+    1. Add Io control Dialog
+    2. Add PrintLog
+
+commit 9a0c0d522e97bbacdb79035ba24edd5ce44d925b
+Author: vmwell-h <vmwell@hotmail.com>
+Date:   Thu Nov 3 18:50:28 2016 +0800
+
+    1.Use CArray to complete Read/Write command sequence
+    2.Fix a network bug, sometime can't receive 6E reponse'
+    '
+
+commit 5fe20335d324e3894e0e7984f5a441de1de97efa
+Author: vmwell-h <vmwell@hotmail.com>
+Date:   Thu Nov 3 18:44:15 2016 +0800
+
+    1.Use CArray to complete Read/Write command sequence
+    2.Fix a network bug, sometime can't receive 6E reponse
+
+commit 4784b1cb808cc135cdf24ec5a608e9877818233c
+Author: vmwell-h <vmwell@hotmail.com>
+Date:   Wed Nov 2 18:50:00 2016 +0800
+
+    Add Diagnostics  table, Add communication  control, package the uds and network into class,Merge the RdWrData.xx to RdWrDidDlg.xx
+
+commit 828b747b427ffbe2ea614194c4f2f34409989738
+Author: vmwell-h <vmwell@hotmail.com>
+Date:   Mon Oct 31 17:30:07 2016 +0800
+
+    Add uds protocal to Project, add a Menu and a DID Dlg
+
+commit a56fed6b4bef7c85187bba823da7be759531f1c7
+Author: well <vmwell@hotmail.com>
+Date:   Sat Oct 22 19:16:06 2016 +0800
+
+    MFCUdsTestTool proj commit first time
+
