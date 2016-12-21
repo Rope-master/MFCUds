@@ -13,7 +13,7 @@
 #include "OpenDevDlg.h"
 #include "RdWrDidDlg.h"
 #include "UdsDiagDlg.h"
-#include "CanCommDlg.h"
+#include "MainPageDlg.h"
 #include "UdsConfDlg.h"
 #include "IoCtrlDlg.h"
 
@@ -63,6 +63,8 @@ CMFCUdsTestToolDlg::CMFCUdsTestToolDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_MFCUDSTESTTOOL_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_Tester3e = TRUE;
 }
 
 void CMFCUdsTestToolDlg::DoDataExchange(CDataExchange* pDX)
@@ -92,7 +94,9 @@ BEGIN_MESSAGE_MAP(CMFCUdsTestToolDlg, CDialogEx)
 	ON_COMMAND(ID_MENU_CC, &CMFCUdsTestToolDlg::OnMenuCc)
 	ON_COMMAND(ID_MENU_UDSCONF, &CMFCUdsTestToolDlg::OnMenuUdsconf)
 	ON_COMMAND(ID_MENU_IOCTRL, &CMFCUdsTestToolDlg::OnMenuIoctrl)
-	ON_WM_TIMER()
+	ON_COMMAND(ID_MENU_SENDMSG, &CMFCUdsTestToolDlg::OnMenuSendmsg)
+	ON_COMMAND(ID_MENU_PRODUCT, &CMFCUdsTestToolDlg::OnMenuProduc)
+	ON_COMMAND(ID_MENU_TESTER3E, &CMFCUdsTestToolDlg::OnMenuTester3e)
 END_MESSAGE_MAP()
 
 
@@ -130,8 +134,10 @@ BOOL CMFCUdsTestToolDlg::OnInitDialog()
 	// TODO: 在此添加额外的初始化代码
 
 	//添加Menu
-	m_Menu.LoadMenu(IDR_MENU1);
+	m_Menu.LoadMenu(IDR_MENU_MAIN);
 	SetMenu(&m_Menu);
+	m_Menu.CheckMenuItem(ID_MENU_PRODUCT, MF_CHECKED);
+	m_Menu.CheckMenuItem(ID_MENU_TESTER3E, MF_CHECKED);
 
 	//为Table control 增加页面
 	m_Table.InsertItem(0, _T("通讯"));
@@ -163,11 +169,11 @@ BOOL CMFCUdsTestToolDlg::OnInitDialog()
 
 	// TODO:  在此添加额外的初始化
 	//开启接收线程
-	//AfxBeginThread(ReceiveThread, 0);
-	//Replace Recv Thread With a Timer
-	SetTimer(1, TIMOUT_RECV_MS, NULL);
+	AfxBeginThread(ReceiveThread, 0);
 	//开启UDS线程
 	AfxBeginThread(UdsMainThread, &theApp.UdsClient);
+	//开启测试仪在线线程
+	AfxBeginThread(Tester3EThread, &theApp.UdsClient);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -443,6 +449,25 @@ INT CMFCUdsTestToolDlg::TransmitCanmsg(VCI_CAN_OBJ *SendObj)
 	return flag;
 }
 
+UINT CMFCUdsTestToolDlg::Tester3EThread(LPVOID v)
+{
+	CMFCUdsTestToolDlg *dlg = (CMFCUdsTestToolDlg*)AfxGetApp()->GetMainWnd();
+	CUdsClient *pObj = (CUdsClient *)v;
+	UdsCmd m_CmdNow;
+
+	//TesterPresent request cmd
+	m_CmdNow.SID = SID_3E;
+	m_CmdNow.CmdBuf[0] = 0x00;
+	m_CmdNow.CmdLen = 1;
+
+	while (1)
+	{
+		if (dlg->m_Tester3e == TRUE)
+		    pObj->request(m_CmdNow.SID, m_CmdNow.CmdBuf, m_CmdNow.CmdLen);
+		Sleep(2000);
+	}
+}
+
 UINT CMFCUdsTestToolDlg::UdsMainThread(LPVOID v)
 {
 	CUdsClient *pObj = (CUdsClient *)v;
@@ -471,12 +496,6 @@ UINT CMFCUdsTestToolDlg::ReceiveThread(LPVOID v)
 		//调用动态链接库接收函数
 		NumValue = VCI_Receive(VCI_USBCAN2, CAN_DEVINDEX, theApp.m_CanChnl, pCanObj, 200, 0);
 
-		//接收信息列表显示
-		CString strTime;
-		SYSTEMTIME systime;
-		GetLocalTime(&systime);
-		strTime.Format(_T("%02d:%02d:%02d:%03d"), systime.wHour, systime.wMinute, systime.wSecond, systime.wMilliseconds);
-
 		for (num = 0; num<NumValue; num++)
 		{
 
@@ -486,7 +505,7 @@ UINT CMFCUdsTestToolDlg::ReceiveThread(LPVOID v)
 				theApp.UdsClient.netowrk_recv_frame(0, pCanObj[num].Data, pCanObj[num].DataLen);
 			dlg->m_CanComm.InsertItem(0, pCanObj);
 		}
-	
+
 		if (theApp.UdsClient.n_ResultErr == TRUE)
 		{
 			theApp.UdsClient.n_ResultErr = FALSE;
@@ -494,44 +513,68 @@ UINT CMFCUdsTestToolDlg::ReceiveThread(LPVOID v)
 			dlg->m_CanComm.PrintLog(0, _T(">>NetWork Err"));
 		}
 
+
 		Sleep(5);
 	}
 
 	return 1;
 }
 
-
-void CMFCUdsTestToolDlg::OnTimer(UINT_PTR nIDEvent)
+void CMFCUdsTestToolDlg::OnMenuSendmsg()
 {
-	// TODO: 在此添加消息处理程序代码和/或调用默认值
-	INT NumValue;
-	INT num = 0;
-	VCI_CAN_OBJ pCanObj[200];
+	// TODO: 在此添加命令处理程序代码
+	DWORD ItemState;
 
-	CString str, str1;
-
-	DWORD ReceivedID;
-
-	//调用动态链接库接收函数
-	NumValue = VCI_Receive(VCI_USBCAN2, CAN_DEVINDEX, theApp.m_CanChnl, pCanObj, 200, 0);
-
-	for (num = 0; num<NumValue; num++)
+	ItemState = m_Menu.CheckMenuItem(ID_MENU_SENDMSG, MF_UNCHECKED | MF_CHECKED);
+	if (MF_UNCHECKED == ItemState)
 	{
-
-		ReceivedID = pCanObj[num].ID;
-
-		if (ReceivedID == theApp.m_Rspid)
-			theApp.UdsClient.netowrk_recv_frame(0, pCanObj[num].Data, pCanObj[num].DataLen);
-		m_CanComm.InsertItem(0, pCanObj);
+		m_Menu.CheckMenuItem(ID_MENU_SENDMSG, MF_CHECKED);
+		m_Menu.CheckMenuItem(ID_MENU_PRODUCT, MF_UNCHECKED);
+		m_CanComm.SetOverlayDlg(m_CanComm.DlgTxMsg);
+	}
+	else
+	{
+		m_Menu.CheckMenuItem(ID_MENU_SENDMSG, MF_UNCHECKED);
+		m_CanComm.SetOverlayDlg(m_CanComm.DlgNone);
 	}
 
-	if (theApp.UdsClient.n_ResultErr == TRUE)
+}
+
+void CMFCUdsTestToolDlg::OnMenuProduc()
+{
+	// TODO: 在此添加命令处理程序代码
+	DWORD ItemState;
+
+	ItemState = m_Menu.CheckMenuItem(ID_MENU_PRODUCT, MF_UNCHECKED | MF_CHECKED);
+	if (MF_UNCHECKED == ItemState)
 	{
-		theApp.UdsClient.n_ResultErr = FALSE;
-		str.Format(_T(">>NetWork Err %u"), theApp.UdsClient.n_Result);
-		m_CanComm.PrintLog(0, _T(">>NetWork Err"));
+		m_Menu.CheckMenuItem(ID_MENU_PRODUCT, MF_CHECKED);
+		m_Menu.CheckMenuItem(ID_MENU_SENDMSG, MF_UNCHECKED);
+		m_CanComm.SetOverlayDlg(m_CanComm.DlgProduc);
+	} 
+	else
+	{
+		m_Menu.CheckMenuItem(ID_MENU_PRODUCT, MF_UNCHECKED);
+		m_CanComm.SetOverlayDlg(m_CanComm.DlgNone);
 	}
+}
 
-	CDialogEx::OnTimer(nIDEvent);
 
+
+void CMFCUdsTestToolDlg::OnMenuTester3e()
+{
+	// TODO: 在此添加命令处理程序代码
+	DWORD ItemState;
+
+	ItemState = m_Menu.CheckMenuItem(ID_MENU_TESTER3E, MF_UNCHECKED | MF_CHECKED);
+	if (MF_UNCHECKED == ItemState)
+	{
+		m_Menu.CheckMenuItem(ID_MENU_TESTER3E, MF_CHECKED);
+		m_Tester3e = TRUE;
+	}
+	else
+	{
+		m_Menu.CheckMenuItem(ID_MENU_TESTER3E, MF_UNCHECKED);
+		m_Tester3e = FALSE;
+	}
 }

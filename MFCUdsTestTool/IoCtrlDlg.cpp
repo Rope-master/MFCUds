@@ -10,7 +10,8 @@
 CString backlight_opt[] =
 {
 	_T("01:Fuel Gauge Dial Backligh Level"),
-	_T("02:Coolant Gauge Dial Backlight Level")
+	_T("02:Coolant Gauge Dial Backlight Level"),
+	_T("03:TFT Screen Backlight Level")
 };
 
 CString backlight_value[] =
@@ -65,7 +66,15 @@ CString indicator_opt[] =
 	_T("05:Turn right lamp"),
 	_T("06:PEPS lamp"),
 	_T("07:Door open lamp"),
-	_T("08:Reserve")
+	_T("08:Seat belt lamp"),
+	_T("09:Passengers seat belt lamp"),
+	_T("10:EPB lamp"),
+	_T("11:Fuel warning lamp"),
+	_T("12:Brake failed lamp"),
+	_T("13:Altemator lamp"),
+	_T("14:Oil Pressure lamp"),
+	_T("15:Caralarm lamp"),
+	_T("16:Reserve")
 };
 
 CString indicator_value[] =
@@ -82,11 +91,11 @@ BYTE indicator[6];
 
 uds_ioctrl_t ioctrl_list[IOCTRL_CNT] =
 {
-	{ _T("Backlight Level"), 0xF092, backlight_level, 2, 0, 0, 0, backlight_opt, 2, 1, backlight_value, 3},
+	{ _T("Backlight Level"), 0xF092, backlight_level, 2, 0, 0, 0, backlight_opt, 3, 1, backlight_value, 3},
 	{ _T("Buzzer"),          0xF020, buzzer,          2, 0, 0, 0, buzzer_opt,    1, 1, buzzer_value,    2},
 	{ _T("Gages"),           0xF021, gages,           2, 0, 0, 0, gages_opt,     2, 3, gages_value,     2},
 	{ _T("Segment Display"), 0xF022, segment_disp,    2, 0, 0, 0, segment_opt,   4, 1, segment_value,   2},
-	{ _T("Indicators"),      0xF024, indicator,       6, 0, 0, 0, indicator_opt, 9, 0, indicator_value, 2}
+	{ _T("Indicators"),      0xF024, indicator,       6, 0, 0, 0, indicator_opt, 17, 0, indicator_value, 2}
 };
 
 
@@ -233,7 +242,7 @@ void CIoCtrlDlg::OnNMClickListIoctrl(NMHDR *pNMHDR, LRESULT *pResult)
 
 	if (nItem != -1)
 		::SetWindowPos(::GetDlgItem(m_hWnd, IDC_COMBO_IOCTRL),
-			HWND_TOP, rect.left + x - 7, rect.top + 13,
+			HWND_TOP, rect.left + x - 7, rect.top + 9,
 			rect.right - rect.left,
 			rect.bottom - rect.top, NULL);
 	::ShowWindow(::GetDlgItem(m_hWnd, IDC_COMBO_IOCTRL), SW_SHOW);
@@ -393,23 +402,63 @@ void CIoCtrlDlg::OnBnClickedButtonIoctrl()
 				if (nItem == (IOCTRL_CNT - 1))
 				{
 					if (ioctrl_list[nItem].p_data[1] == 0) //OFF
-					{ 
+					{
 						BYTE LampPos = ioctrl_list[nItem].p_data[0];
-						CmdNew.CmdBuf[3] &= (~(0x01 << LampPos));
+						if (LampPos < 8)
+						{
+							CmdNew.CmdBuf[3] = 0;
+							CmdNew.CmdBuf[3] &= (~(0x01 << LampPos));
+							CmdNew.CmdBuf[4] = 0;
+							CmdNew.CmdBuf[5] = 0;
+							CmdNew.CmdBuf[6] = 0;
+							CmdNew.CmdBuf[7] = 0;
+							CmdNew.CmdBuf[8] = 0;
+						}
+						else
+						{
+							LampPos -= 8;
+							CmdNew.CmdBuf[3] = 0;
+							CmdNew.CmdBuf[4] = 0;
+							CmdNew.CmdBuf[4] &= (~(0x01 << LampPos));
+							CmdNew.CmdBuf[5] = 0;
+							CmdNew.CmdBuf[6] = 0;
+							CmdNew.CmdBuf[7] = 0;
+							CmdNew.CmdBuf[8] = 0;
+						}
 					}
 					else
 					{
 						BYTE LampPos = ioctrl_list[nItem].p_data[0];
-						CmdNew.CmdBuf[3] |= (0x01 << LampPos);
+						if (LampPos < 8)
+						{
+							CmdNew.CmdBuf[3] = 0;
+							CmdNew.CmdBuf[3] |= (0x01 << LampPos);
+							CmdNew.CmdBuf[4] = 0;
+							CmdNew.CmdBuf[5] = 0;
+							CmdNew.CmdBuf[6] = 0;
+							CmdNew.CmdBuf[7] = 0;
+							CmdNew.CmdBuf[8] = 0;
+						}
+						else
+						{
+							LampPos -= 8;
+							CmdNew.CmdBuf[3] = 0;
+							CmdNew.CmdBuf[4] = 0;
+							CmdNew.CmdBuf[4] |= (0x01 << LampPos);
+							CmdNew.CmdBuf[5] = 0;
+							CmdNew.CmdBuf[6] = 0;
+							CmdNew.CmdBuf[7] = 0;
+							CmdNew.CmdBuf[8] = 0;
+						}
 					}
 
-					CmdNew.CmdLen = 11;
+					CmdNew.CmdLen = 9;
 				}
 				else
 				{
 					CmdNew.CmdBuf[3] = ioctrl_list[nItem].p_data[0];
 					CmdNew.CmdBuf[4] = ioctrl_list[nItem].p_data[1];
-					CmdNew.CmdLen = 7;
+					CmdNew.CmdLen = 5;
 				}
 				m_CmdList.Add(CmdNew);
 				break;

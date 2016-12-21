@@ -1,6 +1,6 @@
 #pragma once
 #include "ColoredListCtrl.h"
-#include "CanCommDlg.h"
+#include "MainPageDlg.h"
 // CIoCtrlDlg ¶Ô»°¿ò
 
 class CIoCtrlDlg : public CDialogEx
@@ -26,7 +26,7 @@ private:
 	CComboBox m_Combo;
 
 public:
-	CCanCommDlg *p_CanComm;
+	CMainPageDlg *p_CanComm;
 	INT nItem, nSubItem;
 
 	CArray<UdsCmd> m_CmdList;

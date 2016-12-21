@@ -5,7 +5,7 @@
 #pragma once
 #include "ColoredListCtrl.h"
 #include "afxwin.h"
-#include "CanCommDlg.h"
+#include "MainPageDlg.h"
 #include "UdsDiagDlg.h"
 #include "UdsCcDlg.h"
 
@@ -45,14 +45,17 @@ private:
 	CColoredListCtrl *m_List;
 
 	int m_CurSelTab;
-	CCanCommDlg m_CanComm;
+	CMainPageDlg m_CanComm;
 	CUdsDiagDlg m_UdsDiag;
 	CDialog* pDialog[2];  //用来保存对话框对象指针
+
+	BOOL m_Tester3e;
 
 public:
 	static INT TransmitCanmsg(VCI_CAN_OBJ *SendObj);
 	static UINT UdsMainThread(void *param);
 	static UINT ReceiveThread(void *param);
+	static UINT Tester3EThread(void *param);
 
 	afx_msg void OnBnClickedBtOpendev();
 	afx_msg void OnMenuOpendev();
@@ -69,5 +72,7 @@ public:
 	afx_msg void OnMenuCc();
 	afx_msg void OnMenuUdsconf();
 	afx_msg void OnMenuIoctrl();
-	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnMenuSendmsg();
+	afx_msg void OnMenuProduc();
+	afx_msg void OnMenuTester3e();
 };

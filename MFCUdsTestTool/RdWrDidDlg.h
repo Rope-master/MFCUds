@@ -99,6 +99,7 @@ typedef struct __UDS_RWDATA_T__
 	BYTE dlc;
 	uds_rwdata_rw rw_mode;
 	uds_rwdata_store rw_store;
+	uds_rwdata_type rw_type;
 }uds_rwdata_t;
 
-#define RWDATA_CNT  12
+#define RWDATA_CNT  14

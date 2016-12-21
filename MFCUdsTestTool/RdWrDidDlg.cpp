@@ -12,6 +12,7 @@
 BYTE ASC_boot_ver[10];
 BYTE uds_session;
 BYTE ASC_sys_supplier_id[5];
+BYTE ASC_hard_ver[10];
 BYTE ASC_soft_ver[10];
 BYTE ASC_sys_name[10];
 BYTE ASC_ecu_part_num[15];
@@ -21,21 +22,24 @@ BYTE ASC_VIN[17];
 BYTE HEX_tester_sn[10];
 BYTE BCD_program_date[3];
 BYTE HEX_Configuration[4];
+BYTE HEX_ClearMaintain[1];
 
 const uds_rwdata_t rwdata_list[RWDATA_CNT] =
 {
-	{ _T("BootVer"),    0xF183, ASC_boot_ver,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH },
-	{ _T("UdsSession"), 0xF186, &uds_session,         1,  UDS_RWDATA_RDONLY,      UDS_RWDATA_RAM },
-	{ _T("EcuPartNUm"), 0xF187, ASC_ecu_part_num,     15, UDS_RWDATA_RDWR_INBOOT, UDS_RWDATA_EEPROM },
-	{ _T("SupplierId"), 0xF18A, ASC_sys_supplier_id,  5,  UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH },
-	{ _T("ManuDate"),   0xF18B, BCD_manufacture_date, 3,  UDS_RWDATA_RDONLY,      UDS_RWDATA_EEPROM }, /* be writen after manufacture */
-	{ _T("EcuSn"),      0xF18C, HEX_ecu_sn,           10, UDS_RWDATA_RDONLY,      UDS_RWDATA_EEPROM }, /* be writen after manufacture */
-	{ _T("VIN"),        0xF190, ASC_VIN,              17, UDS_RWDATA_RDWR_WRONCE, UDS_RWDATA_EEPROM }, /* be writen after installment */
-	{ _T("SoftVer"),    0xF195, ASC_soft_ver,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH },
-	{ _T("SysName"),    0xF197, ASC_sys_name,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH },
-	{ _T("TesterSn"),   0xF198, HEX_tester_sn,        10, UDS_RWDATA_RDWR_INBOOT, UDS_RWDATA_EEPROM }, /* update by tester after program */
-	{ _T("ProgDate"),   0xF199, BCD_program_date,     3,  UDS_RWDATA_RDWR_INBOOT, UDS_RWDATA_EEPROM }, /* update by tester after program */
-	{ _T("Config"),     0x0100, HEX_Configuration,    4,  UDS_RWDATA_RDWR,        UDS_RWDATA_EEPROM }
+	{ _T("BootVer"),    0xF183, ASC_boot_ver,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
+	{ _T("UdsSession"), 0xF186, &uds_session,         1,  UDS_RWDATA_RDONLY,      UDS_RWDATA_RAM,    UDS_RWDATA_HEX },
+	{ _T("EcuPartNUm"), 0xF187, ASC_ecu_part_num,     15, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
+	{ _T("SupplierId"), 0xF18A, ASC_sys_supplier_id,  7,  UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
+	{ _T("ManuDate"),   0xF18B, BCD_manufacture_date, 3,  UDS_RWDATA_RDONLY,      UDS_RWDATA_EEPROM, UDS_RWDATA_BCD }, /* be writen after manufacture */
+	{ _T("EcuSn"),      0xF18C, HEX_ecu_sn,           10, UDS_RWDATA_RDONLY,      UDS_RWDATA_EEPROM, UDS_RWDATA_HEX }, /* be writen after manufacture */
+	{ _T("VIN"),        0xF190, ASC_VIN,              17, UDS_RWDATA_RDWR_WRONCE, UDS_RWDATA_EEPROM, UDS_RWDATA_ASCII }, /* be writen after installment */
+	{ _T("HardVer"),    0xF193, ASC_hard_ver,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
+	{ _T("SoftVer"),    0xF195, ASC_soft_ver,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
+	{ _T("SysName"),    0xF197, ASC_sys_name,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
+	{ _T("TesterSn"),   0xF198, HEX_tester_sn,        10, UDS_RWDATA_RDWR_INBOOT, UDS_RWDATA_EEPROM, UDS_RWDATA_HEX }, /* update by tester after program */
+	{ _T("ProgDate"),   0xF199, BCD_program_date,     3,  UDS_RWDATA_RDWR_INBOOT, UDS_RWDATA_EEPROM, UDS_RWDATA_BCD }, /* update by tester after program */
+	{ _T("Config"),     0x0100, HEX_Configuration,    4,  UDS_RWDATA_RDWR,        UDS_RWDATA_EEPROM, UDS_RWDATA_HEX },
+	{ _T("ClearMt"),    0x0101, HEX_ClearMaintain,    1,  UDS_RWDATA_RDWR,        UDS_RWDATA_EEPROM, UDS_RWDATA_HEX }
 };
 
 // CReadDidDlg 对话框
@@ -157,77 +161,7 @@ void CRdWrDidDlg::OnBnClickedBtRddid()
 	m_WrResult = _T("");
 	m_WrResult += _T("Write");
 	UpdateData(false);//更新控件数据
-#if 0
-	BYTE PreBuf[BUF_LEN];
-	BYTE DidBuf[BUF_LEN];
-	UINT DidLen;
-	UINT listrow = 0;
 
-	BYTE DataBuf[BUF_LEN];
-	UINT readlen;
-
-	PreBuf[0] = 0x03;
-	theApp.UdsClient.request(SID_10, PreBuf, 1);
-	Sleep(100);
-	readlen = theApp.UdsClient.get_rsp(DataBuf, BUF_LEN);
-	if (readlen == 0) return;
-
-	if (RdWr == EmRd)
-	{
-		for (listrow = 0; listrow < RWDATA_CNT; listrow++)
-		{
-			DidLen = 0;
-			if (m_list.GetCheck(listrow))
-			{
-				DidBuf[DidLen++] = (BYTE)(rwdata_list[listrow].did >> 8);
-				DidBuf[DidLen++] = (BYTE)(rwdata_list[listrow].did >> 0);
-
-				theApp.UdsClient.request(SID_22, DidBuf, DidLen);
-				SetTimer(1, TIMOUT_MS, NULL);
-				m_GetRsp = TRUE;
-				break;
-			}
-		}
-	}
-	else
-	{
-		//Request seed
-		PreBuf[0] = 0x01;
-		theApp.UdsClient.request(SID_27, PreBuf, 1);
-		Sleep(200);
-		readlen = theApp.UdsClient.get_rsp(DataBuf, BUF_LEN);
-		if (readlen != 6 || DataBuf[1] != 0x01) return;
-
-		//Send key
-		PreBuf[0] = 0x02;
-		UdsUtil::KeyCalcu(&DataBuf[2], &PreBuf[1]);
-		theApp.UdsClient.request(SID_27, PreBuf, 5);
-		Sleep(100);
-		readlen = theApp.UdsClient.get_rsp(DataBuf, BUF_LEN);
-		if (readlen != 2 || DataBuf[1] != 0x02) return;
-
-		for (listrow = 0; listrow < RWDATA_CNT; listrow++)
-		{
-			DidLen = 0;
-			if (m_list.GetCheck(listrow))
-			{
-				DidBuf[DidLen++] = (BYTE)(rwdata_list[listrow].did >> 8);
-				DidBuf[DidLen++] = (BYTE)(rwdata_list[listrow].did >> 0);
-
-				int i;
-				for (i = 0; i < rwdata_list[listrow].dlc; i++)
-				{
-					DidBuf[DidLen++] = rwdata_list[listrow].p_data[i];
-				}
-
-				theApp.UdsClient.request(SID_2E, DidBuf, DidLen);
-				SetTimer(1, TIMOUT_MS, NULL);
-				m_GetRsp = TRUE;
-				break;
-			}
-		}
-	}
-#endif
 	UdsCmd CmdNew;
 	UINT DidLen;
 	UINT listrow = 0;
@@ -296,63 +230,7 @@ void CRdWrDidDlg::OnBnClickedBtRddid()
 void CRdWrDidDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
-#if 0
-	BYTE DataBuf[BUF_LEN];
-	UINT readlen;
-	UINT remnpos;
 
-	WORD curr_did;
-	UINT listrow = 0;
-	UINT did_n;
-	BOOL find_did;
-	CString str;
-	CString str1;
-
-	if (m_GetRsp == TRUE)
-	{
-		m_GetRsp = FALSE;
-		readlen = theApp.UdsClient.get_rsp(DataBuf, BUF_LEN);
-
-		if (RdWr == EmRd)
-		{
-			remnpos = 1;
-			while (remnpos < readlen)
-			{
-				curr_did = DataBuf[remnpos + 1];
-				curr_did |= ((WORD)DataBuf[remnpos]) << 8;
-
-				find_did = FALSE;
-				for (did_n = 0; did_n < RWDATA_CNT; did_n++)
-				{
-					if (rwdata_list[did_n].did == curr_did)
-					{
-						find_did = TRUE;
-						remnpos += 2;
-						UINT i;
-						for (i = 0; i < rwdata_list[did_n].dlc; i++)
-						{
-							str1.Format(_T("%02X"), DataBuf[remnpos + i]);
-							str += str1;
-						}
-						remnpos += rwdata_list[did_n].dlc;
-						listrow = did_n;
-						m_list.SetItemText(listrow, 3, str);
-						break;
-					}
-				}
-
-				if (find_did == FALSE)
-					break;
-			}
-		}
-		else
-		{
-			/* Always can't get response */
-			if (readlen > 0)
-				MessageBox(_T("write did get response\n"));
-		}
-	}
-#endif
 	BYTE DataBuf[BUF_LEN];
 	UINT readlen;
 	UINT remnpos;
@@ -389,10 +267,30 @@ void CRdWrDidDlg::OnTimer(UINT_PTR nIDEvent)
 		
 								remnpos += 2;
 								UINT i;
-								for (i = 0; i < rwdata_list[did_n].dlc; i++)
+
+								if (rwdata_list[did_n].rw_type == UDS_RWDATA_HEX)
 								{
-									str1.Format(_T("%02X"), DataBuf[remnpos + i]);
-									str += str1;
+									for (i = 0; i < rwdata_list[did_n].dlc; i++)
+									{
+										str1.Format(_T("%2X"), DataBuf[remnpos + i]);
+										str += str1;
+									}
+								}
+								if (rwdata_list[did_n].rw_type == UDS_RWDATA_ASCII)
+								{
+									for (i = 0; i < rwdata_list[did_n].dlc; i++)
+									{
+										str1.Format(_T("%c"), DataBuf[remnpos + i]);
+										str += str1;
+									}
+								}
+								if (rwdata_list[did_n].rw_type == UDS_RWDATA_BCD)
+								{
+									for (i = 0; i < rwdata_list[did_n].dlc; i++)
+									{
+										str1.Format(_T("%X"), DataBuf[remnpos + i]);
+										str += str1;
+									}
 								}
 								remnpos += rwdata_list[did_n].dlc;
 								listrow = did_n;

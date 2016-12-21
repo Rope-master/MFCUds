@@ -1,5 +1,5 @@
 #pragma once
-#include "MyEdit.h"
+#include "LimitEdit.h"
 
 // COpenDevDlg ¶Ô»°¿ò
 
@@ -22,8 +22,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	CMyEdit m_EditExBgnid;
-	CMyEdit m_EditExEndid;
+	CLimitDecEdit m_EditExBgnid;
+	CLimitDecEdit m_EditExEndid;
 
 	CString m_EditBgnid;
 	CString m_EditEndid;
