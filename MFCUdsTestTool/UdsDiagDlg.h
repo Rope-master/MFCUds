@@ -2,6 +2,7 @@
 #include "ColoredListCtrl.h"
 
 // CUdsDiagDlg ¶Ô»°¿ò
+#define DTCST_NUM     8
 
 typedef enum __OBD_DTC_NAME_T__
 {
@@ -65,10 +66,14 @@ protected:
 
 private:
 	CColoredListCtrl m_List;
+	CListCtrl m_ListSt;
 	BOOL SetTim;
+	UINT SetCnt;
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonSptdtc();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnBnClickedButtonClrdtc();
+	afx_msg void OnNMClickListDtc(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedButtonFttoc();
 };

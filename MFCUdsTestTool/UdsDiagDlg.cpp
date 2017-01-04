@@ -43,6 +43,16 @@ static obd_dtc_t obd_dtc_list[OBD_DTC_CNT] =
 	{_T("ESC关闭灯出错"),  _T("B154701"), 0x954701, 0 }
 };
 
+static CString DtcStBit[DTCST_NUM] = {
+	_T("TestFailed"),
+	_T("TestFailedThisOperationCycle"),
+	_T("Pending DTC"),
+	_T("Confirmed DTC"),
+	_T("TestNotCompletedSinceLastClear"),
+	_T("TestFailedSinceLastClear "),
+	_T("TestNotCompletedThisOperationCycle"),
+	_T("WarningIndicatorRequested")
+};
 // CUdsDiagDlg 对话框
 
 IMPLEMENT_DYNAMIC(CUdsDiagDlg, CDialogEx)
@@ -62,6 +72,7 @@ void CUdsDiagDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 
 	DDX_Control(pDX, IDC_LIST_DTC, m_List);
+	DDX_Control(pDX, IDC_LIST_DTCST, m_ListSt);
 }
 
 
@@ -69,6 +80,8 @@ BEGIN_MESSAGE_MAP(CUdsDiagDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SPTDTC, &CUdsDiagDlg::OnBnClickedButtonSptdtc)
 	ON_WM_TIMER()
 	ON_BN_CLICKED(IDC_BUTTON_CLRDTC, &CUdsDiagDlg::OnBnClickedButtonClrdtc)
+	ON_NOTIFY(NM_CLICK, IDC_LIST_DTC, &CUdsDiagDlg::OnNMClickListDtc)
+	ON_BN_CLICKED(IDC_BUTTON_FTTOC, &CUdsDiagDlg::OnBnClickedButtonFttoc)
 END_MESSAGE_MAP()
 
 
@@ -80,6 +93,10 @@ BOOL CUdsDiagDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  在此添加额外的初始化
+	SetTimer(1, 200, NULL);
+	SetTim = FALSE;
+	SetCnt = 0;
+	m_List.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 
 	m_List.InsertColumn(0, _T("序号"));
 	m_List.SetColumnWidth(0, 40);
@@ -96,23 +113,20 @@ BOOL CUdsDiagDlg::OnInitDialog()
 	m_List.InsertColumn(6, _T("状态位"));
 	m_List.SetColumnWidth(6, 50);
 
-	UINT dtc_n;
+	UINT dtcst_n;
 	UINT nowItem;
-	CString str;
-	for (dtc_n = 0; dtc_n < OBD_DTC_CNT; dtc_n++)
+
+	//List Dtc state
+	m_ListSt.SetExtendedStyle(LVS_EX_GRIDLINES);
+
+	m_ListSt.InsertColumn(0, _T("状态位"));
+	m_ListSt.SetColumnWidth(0, 200);
+	m_ListSt.InsertColumn(1, _T("位值"));
+	m_ListSt.SetColumnWidth(1, 40);
+
+	for (dtcst_n = 0; dtcst_n < DTCST_NUM; dtcst_n++)
 	{
-
-			str.Format(_T("%d"), dtc_n);
-			nowItem = m_List.InsertItem(dtc_n, str);
-
-			m_List.SetItemText(nowItem, 1, obd_dtc_list[dtc_n].Name);	    //Dtc Name
-			m_List.SetItemText(nowItem, 2, obd_dtc_list[dtc_n].DispCode);	//Display code
-
-			str.Format(_T("0X%06X"), obd_dtc_list[dtc_n].DtcCode);
-			m_List.SetItemText(nowItem, 3, str);	                        //Dtc
-
-			m_List.SetItemText(nowItem, 5, _T("0x0"));                      //Dtc status
-
+		nowItem = m_ListSt.InsertItem(dtcst_n, DtcStBit[dtcst_n]);
 	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -131,10 +145,31 @@ void CUdsDiagDlg::OnBnClickedButtonSptdtc()
 
 	theApp.UdsClient.request(SID_19, CmdBuf, CmdLen);
 
-	SetTimer(1, 200, NULL);
 	SetTim = TRUE;
+	SetCnt = 2;
+
+	m_List.DeleteAllItems();
+	UpdateData(FALSE);//更新数据
 }
 
+void CUdsDiagDlg::OnBnClickedButtonFttoc()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	BYTE CmdBuf[BUF_LEN];
+	UINT CmdLen = 2;
+
+	//ReportDTCByStatusMask
+	CmdBuf[0] = 0x02;
+	CmdBuf[1] = 0x02; //Test failed this operation cycle
+
+	theApp.UdsClient.request(SID_19, CmdBuf, CmdLen);
+
+	SetTim = TRUE;
+	SetCnt = 2;
+
+	m_List.DeleteAllItems();
+	UpdateData(FALSE);//更新数据
+}
 
 void CUdsDiagDlg::OnTimer(UINT_PTR nIDEvent)
 {
@@ -147,10 +182,16 @@ void CUdsDiagDlg::OnTimer(UINT_PTR nIDEvent)
 	UINT DtcCode;
 	BYTE DtcSt;
 
-
-	UINT listrow;
+	UINT dtc_n;
+	UINT nowItem;
+	BOOL find_dtc;
 	CString str;
 
+	if (SetCnt != 0)
+	{
+		SetCnt--;
+		goto TimerEnd;
+	}
 	if (SetTim == TRUE)
 	{
 		SetTim = FALSE;
@@ -169,12 +210,23 @@ void CUdsDiagDlg::OnTimer(UINT_PTR nIDEvent)
 			DtcSt = DataBuf[remnpos+3];
 			remnpos += 4;
 
-			for (listrow = 0; listrow < OBD_DTC_CNT; listrow++)
+			for (dtc_n = 0; dtc_n < OBD_DTC_CNT; dtc_n++)
 			{
-				if (obd_dtc_list[listrow].DtcCode == DtcCode)
+				if (obd_dtc_list[dtc_n].DtcCode == DtcCode)
 				{
+					str.Format(_T("%d"), dtc_n);
+					nowItem = m_List.InsertItem(dtc_n, str);
+
+					m_List.SetItemText(nowItem, 1, obd_dtc_list[dtc_n].Name);	    //Dtc Name
+					m_List.SetItemText(nowItem, 2, obd_dtc_list[dtc_n].DispCode);	//Display code
+
+					str.Format(_T("0X%06X"), obd_dtc_list[dtc_n].DtcCode);
+					m_List.SetItemText(nowItem, 3, str);	                        //Dtc
+
 					str.Format(_T("0X%02X"), DtcSt);
-					m_List.SetItemText(listrow, 5, str);             //Dtc status
+					m_List.SetItemText(nowItem, 5, str);             //Dtc status
+
+					obd_dtc_list[dtc_n].DtcSt = DtcSt;
 
 					break;
 				}
@@ -183,6 +235,8 @@ void CUdsDiagDlg::OnTimer(UINT_PTR nIDEvent)
 		}
 
 	}
+
+TimerEnd:
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -200,4 +254,37 @@ void CUdsDiagDlg::OnBnClickedButtonClrdtc()
 	CmdBuf[2] = 0xFF;
 
 	theApp.UdsClient.request(SID_14, CmdBuf, CmdLen);
+}
+
+
+void CUdsDiagDlg::OnNMClickListDtc(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	INT mItem, mSubItem;
+
+	//get the row number
+	mItem = pNMItemActivate->iItem;
+	//get the column number
+	mSubItem = pNMItemActivate->iSubItem;
+
+	if (mItem == -1) return;
+
+
+	BYTE DtcSt;
+	UINT dtcst_n;
+	DtcSt = obd_dtc_list[mItem].DtcSt;
+
+	for (dtcst_n = 0; dtcst_n < DTCST_NUM; dtcst_n++)
+	{
+		if (DtcSt & (0x01 << dtcst_n))
+		{
+			m_ListSt.SetItemText(dtcst_n, 1, _T("1"));	    //DtcSt Bit
+		}
+		else
+		{
+			m_ListSt.SetItemText(dtcst_n, 1, _T("0"));	    //DtcSt Bit
+		}
+	}
+	*pResult = 0;
 }
