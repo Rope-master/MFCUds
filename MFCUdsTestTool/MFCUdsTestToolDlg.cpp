@@ -325,8 +325,11 @@ void CMFCUdsTestToolDlg::OnMenuDtcon()
 	BYTE CmdBuf[BUF_LEN];
 	UINT CmdLen = 1;
 
-	CmdBuf[0] = 0x01;
+	// Request Extened Session
+	CmdBuf[0] = 0x03;
+	theApp.UdsClient.request(SID_10, CmdBuf, CmdLen);
 
+	CmdBuf[0] = 0x01;
 	theApp.UdsClient.request(SID_85, CmdBuf, CmdLen);
 
 	m_CanComm.PrintLog(0, _T(">>Dtc Control On"));
@@ -340,8 +343,11 @@ void CMFCUdsTestToolDlg::OnMenuDtcoff()
 	BYTE CmdBuf[BUF_LEN];
 	UINT CmdLen = 1;
 
-	CmdBuf[0] = 0x02;
+	// Request Extened Session
+	CmdBuf[0] = 0x03;
+	theApp.UdsClient.request(SID_10, CmdBuf, CmdLen);
 
+	CmdBuf[0] = 0x02;
 	theApp.UdsClient.request(SID_85, CmdBuf, CmdLen);
 
 	m_CanComm.PrintLog(0, _T(">>Dtc Control Off"));

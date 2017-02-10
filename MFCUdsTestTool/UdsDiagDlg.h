@@ -44,6 +44,7 @@ typedef struct __OBD_DTC_PARA_T__
 	CString DispCode;
 	UINT  DtcCode;
 	BYTE  DtcSt;
+	UINT  ListRow;
 }obd_dtc_t;
 
 class CUdsDiagDlg : public CDialogEx
