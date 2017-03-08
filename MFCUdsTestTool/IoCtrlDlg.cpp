@@ -9,8 +9,8 @@
 
 CString backlight_opt[] =
 {
-	_T("01:Fuel Gauge Dial Backligh Level"),
-	_T("02:Coolant Gauge Dial Backlight Level"),
+	_T("01:Batt SOC Dial Backligh Level"),
+	_T("02:Motor Temp Gauge Dial Backlight Level"),
 	_T("03:TFT Screen Backlight Level")
 };
 
@@ -33,8 +33,8 @@ CString buzzer_value[] =
 };
 CString gages_opt[] =
 {
-	_T("03:Coolant gauge"),
-	_T("04:Fuel gauge")
+	_T("03:Motor Temp"),
+	_T("04:Batt SOC")
 };
 CString gages_value[] =
 {
@@ -69,12 +69,10 @@ CString indicator_opt[] =
 	_T("08:Seat belt lamp"),
 	_T("09:Passengers seat belt lamp"),
 	_T("10:EPB lamp"),
-	_T("11:Fuel warning lamp"),
-	_T("12:Brake failed lamp"),
-	_T("13:Altemator lamp"),
-	_T("14:Oil Pressure lamp"),
-	_T("15:Caralarm lamp"),
-	_T("16:Reserve")
+	_T("11:Brake failed lamp"),
+	_T("12:Altemator lamp"),
+	_T("13:Caralarm lamp"),
+	_T("14:Reserve")
 };
 
 CString indicator_value[] =
@@ -95,7 +93,7 @@ uds_ioctrl_t ioctrl_list[IOCTRL_CNT] =
 	{ _T("Buzzer"),          0xF020, buzzer,          2, 0, 0, 0, buzzer_opt,    1, 1, buzzer_value,    2},
 	{ _T("Gages"),           0xF021, gages,           2, 0, 0, 0, gages_opt,     2, 3, gages_value,     2},
 	{ _T("Segment Display"), 0xF022, segment_disp,    2, 0, 0, 0, segment_opt,   4, 1, segment_value,   2},
-	{ _T("Indicators"),      0xF024, indicator,       6, 0, 0, 0, indicator_opt, 17, 0, indicator_value, 2}
+	{ _T("Indicators"),      0xF024, indicator,       6, 0, 0, 0, indicator_opt, 15, 0, indicator_value, 2}
 };
 
 
