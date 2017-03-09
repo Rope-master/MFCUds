@@ -69,9 +69,9 @@ CString indicator_opt[] =
 	_T("08:Seat belt lamp"),
 	_T("09:Passengers seat belt lamp"),
 	_T("10:EPB lamp"),
-	_T("11:Brake failed lamp"),
-	_T("12:Altemator lamp"),
-	_T("13:Caralarm lamp"),
+	_T("11:Reserved"),
+	_T("12:Brake failed lamp"),
+	_T("13:Altemator lamp"),
 	_T("14:Reserve")
 };
 
