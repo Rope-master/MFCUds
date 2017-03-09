@@ -30,8 +30,11 @@ private:
 	CString m_Editprintstr;
 	CEdit m_Editprint;
 
+
 	CSendMsgDlg m_SendMsg;
 	CProductDlg m_Product;
+
+	CCriticalSection m_CriticalSection;
 
 public:
 	enum {

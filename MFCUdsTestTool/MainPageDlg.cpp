@@ -94,7 +94,9 @@ void CMainPageDlg::OnBnClickedCheckRecv()
 void CMainPageDlg::OnBnClickedButtonClear()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	m_CriticalSection.Lock();
 	m_Editprintstr.Empty();
+	m_CriticalSection.Unlock();
 
 	m_List.DeleteAllItems();
 	UpdateData(FALSE);//更新数据
@@ -178,12 +180,19 @@ void CMainPageDlg::InsertItem(INT Dire, VCI_CAN_OBJ * pCanObj)
 
 void CMainPageDlg::PrintLog(UINT LogColor, CString LogContent)
 {
+	m_CriticalSection.Lock();
 	m_Editprintstr += LogContent;
 	m_Editprintstr += _T("\r\n");
 	UpdateData(FALSE);//更新数据
 
 	INT Index = m_Editprint.GetLineCount();
 	m_Editprint.LineScroll(Index, 0);
+
+	if (Index > 10000)
+	{
+		m_Editprintstr.Empty();
+	}
+	m_CriticalSection.Unlock();
 }
 
 
