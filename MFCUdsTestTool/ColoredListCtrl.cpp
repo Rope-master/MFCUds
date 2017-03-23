@@ -14,10 +14,11 @@ static char THIS_FILE[] = __FILE__;
 // CColoredListCtrl
 CColoredListCtrl::CColoredListCtrl()
 {
-	m_colRow0 = RGB(200,200,250);
-	m_colRow1 = RGB(230,247,247);
+	m_colRow1 = RGB(200,200,250);
+	m_colRow0 = RGB(230,247,247);
 	m_colRow2 = RGB(192,192,192);
 	m_colRow3 = RGB(0, 0, 0);
+	m_colRow4 = RGB(255, 255, 255);
 //	m_colRow1 = RGB(240,247,249);
 //	m_colRow2 = RGB(229,232,239);
 }
@@ -124,7 +125,7 @@ BOOL CColoredListCtrl::OnEraseBkgnd(CDC* pDC)
 
 //  POINT mypoint;  
  
-  CBrush brush1(m_colRow1);
+  CBrush brush1(m_colRow4);
 
 
  

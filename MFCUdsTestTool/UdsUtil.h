@@ -16,6 +16,7 @@ public:
 public:
 	static LONG str2HEX(PBYTE src_str, PBYTE dst_buf);
 	static LONG str2char(CString str, PBYTE ptr);
+	static LONG str2DEC(PBYTE src_str, PBYTE dst_buf);
 	static UINT seedTOKey(UINT Seed);
 	static void KeyCalcu(PBYTE SeedBuf, PBYTE KeyBuf);
 };

@@ -22,7 +22,8 @@ public:
 	COLORREF m_colRow0;
 	COLORREF m_colRow1;
 	COLORREF m_colRow2;
-	COLORREF m_colRow3;
+	COLORREF m_colRow3; 
+	COLORREF m_colRow4;
 // Operations
 public:
 	unsigned char ItemColorFlag[60000];
