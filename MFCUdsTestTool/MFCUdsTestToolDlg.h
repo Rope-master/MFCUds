@@ -8,6 +8,7 @@
 #include "MainPageDlg.h"
 #include "UdsDiagDlg.h"
 #include "UdsCcDlg.h"
+#include "ProductDlg.h"
 
 #include "ControlCAN.h"
 
@@ -47,7 +48,8 @@ private:
 	int m_CurSelTab;
 	CMainPageDlg m_CanComm;
 	CUdsDiagDlg m_UdsDiag;
-	CDialog* pDialog[2];  //用来保存对话框对象指针
+	CProductDlg m_PrdDiag;
+	CDialog* pDialog[5];  //用来保存对话框对象指针
 
 	BOOL m_Tester3e;
 

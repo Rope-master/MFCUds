@@ -142,11 +142,12 @@ BOOL CMFCUdsTestToolDlg::OnInitDialog()
 	//为Table control 增加页面
 	m_Table.InsertItem(0, _T("通讯"));
 	m_Table.InsertItem(1, _T("诊断"));
+	m_Table.InsertItem(2, _T("生产"));
 
 	//创建对话框
 	m_CanComm.Create(IDD_DIALOG_COM, &m_Table);
 	m_UdsDiag.Create(IDD_DIALOG_DIAG, &m_Table);
-
+	m_PrdDiag.Create(IDD_DIALOG_PRODUCT, &m_Table);
 
 	//设定在Table内显示的范围
 	CRect rc;
@@ -157,13 +158,16 @@ BOOL CMFCUdsTestToolDlg::OnInitDialog()
 	rc.right -= 0;
 	m_CanComm.MoveWindow(&rc);
 	m_UdsDiag.MoveWindow(&rc);
+	m_PrdDiag.MoveWindow(&rc);
 
 	//把对话框对象指针保存起来
 	pDialog[0] = &m_CanComm;
 	pDialog[1] = &m_UdsDiag;
+	pDialog[2] = &m_PrdDiag;
 	//显示初始页面
 	pDialog[0]->ShowWindow(SW_SHOW);
 	pDialog[1]->ShowWindow(SW_HIDE);
+	pDialog[2]->ShowWindow(SW_HIDE);
 	//保存当前选择
 	m_CurSelTab = 0;
 
@@ -530,7 +534,7 @@ void CMFCUdsTestToolDlg::OnMenuSendmsg()
 {
 	// TODO: 在此添加命令处理程序代码
 	DWORD ItemState;
-
+#if 0
 	ItemState = m_Menu.CheckMenuItem(ID_MENU_SENDMSG, MF_UNCHECKED | MF_CHECKED);
 	if (MF_UNCHECKED == ItemState)
 	{
@@ -543,14 +547,14 @@ void CMFCUdsTestToolDlg::OnMenuSendmsg()
 		m_Menu.CheckMenuItem(ID_MENU_SENDMSG, MF_UNCHECKED);
 		m_CanComm.SetOverlayDlg(m_CanComm.DlgNone);
 	}
-
+#endif
 }
 
 void CMFCUdsTestToolDlg::OnMenuProduc()
 {
 	// TODO: 在此添加命令处理程序代码
 	DWORD ItemState;
-
+#if 0
 	ItemState = m_Menu.CheckMenuItem(ID_MENU_PRODUCT, MF_UNCHECKED | MF_CHECKED);
 	if (MF_UNCHECKED == ItemState)
 	{
@@ -563,6 +567,7 @@ void CMFCUdsTestToolDlg::OnMenuProduc()
 		m_Menu.CheckMenuItem(ID_MENU_PRODUCT, MF_UNCHECKED);
 		m_CanComm.SetOverlayDlg(m_CanComm.DlgNone);
 	}
+#endif
 }
 
 

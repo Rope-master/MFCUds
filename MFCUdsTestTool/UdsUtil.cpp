@@ -48,6 +48,11 @@ LONG UdsUtil::str2HEX(PBYTE src_str, PBYTE dst_buf)
 
 	len = strlen((char *)src_str);
 
+	if (src_str[0] == '0' && (src_str[1] == 'x' || src_str[1] == 'X'))
+	{
+		len -= 2;
+		src_str += 2;
+	}
 	dst_pos = 0;
 
 	if (len % 2)
@@ -116,6 +121,36 @@ LONG UdsUtil::str2HEX(PBYTE src_str, PBYTE dst_buf)
 
 
 	return dst_pos + 1;
+}
+
+LONG UdsUtil::str2DEC(PBYTE src_str, PBYTE dst_buf)
+{
+
+	BYTE hex;
+	BYTE char_tmp;
+	LONG i, len;
+
+	len = strlen((char *)src_str);
+
+
+	for (i = 0; i < len; i++)
+	{
+
+		char_tmp = src_str[i];
+
+		if (' ' == char_tmp || '\n' == char_tmp || '\t' == char_tmp || '\r' == char_tmp)
+			break;
+
+		if (char_tmp >= '0' && char_tmp <= '9')
+			hex = char_tmp - '0';
+		else
+			hex = 0;
+
+		dst_buf[i] = hex;
+
+	}
+
+	return len;
 }
 
 UINT UdsUtil::seedTOKey(UINT Seed)

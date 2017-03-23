@@ -69,9 +69,6 @@
     <ClInclude Include="IoCtrlDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="SendMsgDlg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="LimitEdit.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -79,6 +76,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MainPageDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EditMsgDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -122,9 +122,6 @@
     <ClCompile Include="IoCtrlDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="SendMsgDlg.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="LimitEdit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -132,6 +129,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MainPageDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EditMsgDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

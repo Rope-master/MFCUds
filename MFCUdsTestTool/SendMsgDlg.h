@@ -1,7 +1,9 @@
 #pragma once
 #include "LimitEdit.h"
-
+#include "EditMsgDlg.h"
+#include "ColoredListCtrl.h"
 // CSendMsgDlg ¶Ô»°¿ò
+
 
 class CSendMsgDlg : public CDialogEx
 {
@@ -22,16 +24,26 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private:
-	CLimitHexEdit m_EditData;
 
-	CString m_Editcantx;
-	CString m_EditCanid;
 
-	BOOL m_CanExt;
-	BOOL m_CanRmt;
 public:
 	virtual BOOL OnInitDialog();
-	afx_msg void OnBnClickedButtonTx();
 	virtual void OnOK();
 	virtual void OnCancel();
+#if 0
+	afx_msg void OnNMRClickListXmit(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnMenuAddmsg();
+	void XmitMsgAdd();
+	// Convert a EditMsg to CanMsg
+	CanMsg_t MsgConvert(EditMsg_t EditMsg);
+	afx_msg void OnMenuEditmsg();
+	afx_msg void OnMenuDelmsg();
+	afx_msg void OnMenuClrmsg();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+	static UINT XmitThread(void *param);
+	afx_msg void OnBnClickedCheckXmit();
+	afx_msg void OnBnClickedCheckSameid();
+#endif
 };
