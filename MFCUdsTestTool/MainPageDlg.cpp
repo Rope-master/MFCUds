@@ -58,6 +58,8 @@ BEGIN_MESSAGE_MAP(CMainPageDlg, CDialogEx)
 	ON_COMMAND(ID_MENU_CLRMSG, &CMainPageDlg::OnMenuClrmsg)
 	ON_WM_TIMER()
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_XMIT, &CMainPageDlg::OnNMDblclkListXmit)
+	ON_BN_CLICKED(IDC_CHECK_SAMEID, &CMainPageDlg::OnBnClickedCheckSameid)
+	ON_BN_CLICKED(IDC_CHECK_XMIT, &CMainPageDlg::OnBnClickedCheckXmit)
 END_MESSAGE_MAP()
 
 
@@ -147,7 +149,7 @@ void CMainPageDlg::InsertItem(INT Dire, VCI_CAN_OBJ * pCanObj)
 
 	UINT JustnowItem;
 
-	if (pCanObj->ID < theApp.m_Bgnid || pCanObj->ID > theApp.m_Endid) return;
+	if ((theApp.m_FilterEn == TRUE) && (pCanObj->ID < theApp.m_Bgnid || pCanObj->ID > theApp.m_Endid)) return;
 
 	//������Ϣ�б���ʾ
 	CString str;
@@ -662,4 +664,18 @@ void CMainPageDlg::OnNMDblclkListXmit(NMHDR *pNMHDR, LRESULT *pResult)
 	m_XmitList.SetItemText(nItem, 5, EditMsg.FrameNum);	//Frame Num
 
 	*pResult = 0;
+}
+
+
+void CMainPageDlg::OnBnClickedCheckSameid()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
+}
+
+
+void CMainPageDlg::OnBnClickedCheckXmit()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
 }

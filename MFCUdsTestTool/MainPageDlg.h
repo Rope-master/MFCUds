@@ -84,4 +84,6 @@ public:
 	CanMsg_t MsgConvert(EditMsg_t EditMsg);
 	static UINT XmitThread(void *param);
 	afx_msg void OnNMDblclkListXmit(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedCheckSameid();
+	afx_msg void OnBnClickedCheckXmit();
 };
