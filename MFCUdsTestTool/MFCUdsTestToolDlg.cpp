@@ -513,7 +513,7 @@ UINT CMFCUdsTestToolDlg::ReceiveThread(LPVOID v)
 
 			if (ReceivedID == theApp.m_Rspid)
 				theApp.UdsClient.netowrk_recv_frame(0, pCanObj[num].Data, pCanObj[num].DataLen);
-			dlg->m_CanComm.InsertItem(0, pCanObj);
+			dlg->m_CanComm.InsertItem(0, &pCanObj[num]);
 		}
 
 		if (theApp.UdsClient.n_ResultErr == TRUE)
