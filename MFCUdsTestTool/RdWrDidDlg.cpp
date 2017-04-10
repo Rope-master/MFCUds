@@ -26,18 +26,14 @@ BYTE HEX_ClearMaintain[1];
 
 const uds_rwdata_t rwdata_list[RWDATA_CNT] =
 {
-	{ _T("BootVer"),    0xF183, ASC_boot_ver,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
 	{ _T("UdsSession"), 0xF186, &uds_session,         1,  UDS_RWDATA_RDONLY,      UDS_RWDATA_RAM,    UDS_RWDATA_HEX },
 	{ _T("EcuPartNUm"), 0xF187, ASC_ecu_part_num,     15, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
 	{ _T("SupplierId"), 0xF18A, ASC_sys_supplier_id,  7,  UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
 	{ _T("ManuDate"),   0xF18B, BCD_manufacture_date, 3,  UDS_RWDATA_RDONLY,      UDS_RWDATA_EEPROM, UDS_RWDATA_BCD }, /* be writen after manufacture */
 	{ _T("EcuSn"),      0xF18C, HEX_ecu_sn,           10, UDS_RWDATA_RDONLY,      UDS_RWDATA_EEPROM, UDS_RWDATA_HEX }, /* be writen after manufacture */
 	{ _T("VIN"),        0xF190, ASC_VIN,              17, UDS_RWDATA_RDWR_WRONCE, UDS_RWDATA_EEPROM, UDS_RWDATA_ASCII }, /* be writen after installment */
-	{ _T("HardVer"),    0xF193, ASC_hard_ver,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
 	{ _T("SoftVer"),    0xF195, ASC_soft_ver,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
 	{ _T("SysName"),    0xF197, ASC_sys_name,         10, UDS_RWDATA_RDONLY,      UDS_RWDATA_DFLASH, UDS_RWDATA_ASCII },
-	{ _T("TesterSn"),   0xF198, HEX_tester_sn,        10, UDS_RWDATA_RDWR_INBOOT, UDS_RWDATA_EEPROM, UDS_RWDATA_HEX }, /* update by tester after program */
-	{ _T("ProgDate"),   0xF199, BCD_program_date,     3,  UDS_RWDATA_RDWR_INBOOT, UDS_RWDATA_EEPROM, UDS_RWDATA_BCD }, /* update by tester after program */
 	{ _T("Config"),     0x0100, HEX_Configuration,    4,  UDS_RWDATA_RDWR,        UDS_RWDATA_EEPROM, UDS_RWDATA_HEX },
 	{ _T("ClearMt"),    0x0101, HEX_ClearMaintain,    1,  UDS_RWDATA_RDWR,        UDS_RWDATA_EEPROM, UDS_RWDATA_HEX }
 };

@@ -6,7 +6,7 @@
 #define UNDEFINESEED				0xFFFFFFFF
 #define SEEDMASK					0x80000000
 #define SHIFTBIT					1
-#define ALGORITHMASK				0x42303131
+#define ALGORITHMASK				0x4D313231
 
 class UdsUtil
 {

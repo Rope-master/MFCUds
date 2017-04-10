@@ -102,4 +102,4 @@ typedef struct __UDS_RWDATA_T__
 	uds_rwdata_type rw_type;
 }uds_rwdata_t;
 
-#define RWDATA_CNT  14
+#define RWDATA_CNT  10
