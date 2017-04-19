@@ -97,6 +97,7 @@ BEGIN_MESSAGE_MAP(CMFCUdsTestToolDlg, CDialogEx)
 	ON_COMMAND(ID_MENU_SENDMSG, &CMFCUdsTestToolDlg::OnMenuSendmsg)
 	ON_COMMAND(ID_MENU_PRODUCT, &CMFCUdsTestToolDlg::OnMenuProduc)
 	ON_COMMAND(ID_MENU_TESTER3E, &CMFCUdsTestToolDlg::OnMenuTester3e)
+	ON_COMMAND(ID_MENU_SA, &CMFCUdsTestToolDlg::OnMenuSa)
 END_MESSAGE_MAP()
 
 
@@ -308,15 +309,32 @@ void CMFCUdsTestToolDlg::OnMenuWdid()
 void CMFCUdsTestToolDlg::OnMenuReset()
 {
 	// TODO: 在此添加命令处理程序代码
-	BYTE RstBuf[BUF_LEN];
-	UINT RstLen = 1;
+	UdsCmd CmdNew;
 
-    // Request Extened Session
-	RstBuf[0] = 0x03;
-	theApp.UdsClient.request(SID_10, RstBuf, RstLen);
+	//Push Session request cmd
+	CmdNew.SID = SID_10;
+	CmdNew.CmdBuf[0] = 0x03;
+	CmdNew.CmdLen = 1;
+	theApp.UdsClient.push_cmd(CmdNew);
 
-	RstBuf[0] = 0x01;
-	theApp.UdsClient.request(SID_11, RstBuf, RstLen);
+	//Push request seed cmd
+	CmdNew.SID = SID_27;
+	CmdNew.CmdBuf[0] = 0x01;
+	CmdNew.CmdLen = 1;
+	theApp.UdsClient.push_cmd(CmdNew);
+
+	//Push send key cmd
+	CmdNew.SID = SID_27;
+	CmdNew.CmdBuf[0] = 0x02;
+	CmdNew.CmdLen = 5;
+	theApp.UdsClient.push_cmd(CmdNew);
+
+	//Push hardware reset cmd
+	CmdNew.SID = SID_11;
+	CmdNew.CmdBuf[0] = 0x01;
+	CmdNew.CmdLen = 1;
+	theApp.UdsClient.push_cmd(CmdNew);
+
 	m_CanComm.PrintLog(0, _T(">>Reset Mcu"));
 	m_CanComm.PrintLog(0, _T("      End"));
 }
@@ -588,4 +606,29 @@ void CMFCUdsTestToolDlg::OnMenuTester3e()
 		m_Menu.CheckMenuItem(ID_MENU_TESTER3E, MF_UNCHECKED);
 		m_Tester3e = FALSE;
 	}
+}
+
+
+void CMFCUdsTestToolDlg::OnMenuSa()
+{
+	// TODO: 在此添加命令处理程序代码
+	UdsCmd CmdNew;
+
+	//Push Session request cmd
+	CmdNew.SID = SID_10;
+	CmdNew.CmdBuf[0] = 0x03;
+	CmdNew.CmdLen = 1;
+	theApp.UdsClient.push_cmd(CmdNew);
+
+	//Push request seed cmd
+	CmdNew.SID = SID_27;
+	CmdNew.CmdBuf[0] = 0x01;
+	CmdNew.CmdLen = 1;
+	theApp.UdsClient.push_cmd(CmdNew);
+
+	//Push send key cmd
+	CmdNew.SID = SID_27;
+	CmdNew.CmdBuf[0] = 0x02;
+	CmdNew.CmdLen = 5;
+	theApp.UdsClient.push_cmd(CmdNew);
 }

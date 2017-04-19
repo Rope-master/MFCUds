@@ -77,4 +77,5 @@ public:
 	afx_msg void OnMenuSendmsg();
 	afx_msg void OnMenuProduc();
 	afx_msg void OnMenuTester3e();
+	afx_msg void OnMenuSa();
 };

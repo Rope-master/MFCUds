@@ -9,18 +9,14 @@
 #include "UdsUtil.h"
 
 // Read/Write Did date
-BYTE ASC_boot_ver[10];
 BYTE uds_session;
 BYTE ASC_sys_supplier_id[5];
-BYTE ASC_hard_ver[10];
 BYTE ASC_soft_ver[10];
 BYTE ASC_sys_name[10];
 BYTE ASC_ecu_part_num[15];
 BYTE BCD_manufacture_date[3];
 BYTE HEX_ecu_sn[10];
 BYTE ASC_VIN[17];
-BYTE HEX_tester_sn[10];
-BYTE BCD_program_date[3];
 BYTE HEX_Configuration[4];
 BYTE HEX_ClearMaintain[1];
 

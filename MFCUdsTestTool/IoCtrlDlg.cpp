@@ -95,7 +95,7 @@ uds_ioctrl_t ioctrl_list[IOCTRL_CNT] =
 	{ _T("Buzzer"),          0xF020, buzzer,          2, 0, 0, 0, buzzer_opt,    1, 1, buzzer_value,    2},
 	{ _T("Gages"),           0xF021, gages,           2, 0, 0, 0, gages_opt,     2, 3, gages_value,     2},
 	{ _T("Segment Display"), 0xF022, segment_disp,    2, 0, 0, 0, segment_opt,   4, 1, segment_value,   2},
-	{ _T("Indicators"),      0xF024, indicator,       6, 0, 0, 0, indicator_opt, 17, 0, indicator_value, 2}
+	{ _T("Indicators"),      0xF024, indicator,       6, 0, 0, 0, indicator_opt, 17,0, indicator_value, 2}
 };
 
 
@@ -142,7 +142,7 @@ BOOL CIoCtrlDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  在此添加额外的初始化
-	SetTimer(1, TIMOUT_MS, NULL);
+	//SetTimer(1, TIMOUT_MS, NULL);
 
 	::ShowWindow(::GetDlgItem(m_hWnd, IDC_COMBO_IOCTRL), SW_HIDE);
 
@@ -351,21 +351,6 @@ void CIoCtrlDlg::OnBnClickedButtonIoctrl()
 	// TODO: 在此添加控件通知处理程序代码
 	if (nItem >= 0 && nItem < IOCTRL_CNT)
 	{
-#if 0
-		BYTE DataBuf[BUF_LEN];
-		UINT DataLen;
-		if (nItem == (IOCTRL_CNT - 1))
-			DataLen = 6;
-		else
-			DataLen = 2;
-
-		DataBuf[0] = ioctrl_list[nItem].p_data[0];
-		DataBuf[1] = ioctrl_list[nItem].p_data[1];
-		theApp.UdsClient.request(SID_2F, DataBuf, DataLen);
-
-		SetTimer(1, TIMOUT_MS, NULL);
-		m_GetRsp = TRUE;
-#endif
 		UdsCmd CmdNew;
 		UINT listrow = 0;
 
@@ -373,20 +358,23 @@ void CIoCtrlDlg::OnBnClickedButtonIoctrl()
 		CmdNew.SID = SID_10;
 		CmdNew.CmdBuf[0] = 0x03;
 		CmdNew.CmdLen = 1;
-		m_CmdList.Add(CmdNew);
+		//m_CmdList.Add(CmdNew);
+		theApp.UdsClient.push_cmd(CmdNew);
 
 
 		//Push request seed cmd
 		CmdNew.SID = SID_27;
 		CmdNew.CmdBuf[0] = 0x01;
 		CmdNew.CmdLen = 1;
-		m_CmdList.Add(CmdNew);
+		//m_CmdList.Add(CmdNew);
+		theApp.UdsClient.push_cmd(CmdNew);
 
 		//Push send key cmd
 		CmdNew.SID = SID_27;
 		CmdNew.CmdBuf[0] = 0x02;
 		CmdNew.CmdLen = 5;
-		m_CmdList.Add(CmdNew);
+		//m_CmdList.Add(CmdNew);
+		theApp.UdsClient.push_cmd(CmdNew);
 
 		//Push Io Control cmd
 		for (listrow = 0; listrow < IOCTRL_CNT; listrow++)
@@ -460,7 +448,8 @@ void CIoCtrlDlg::OnBnClickedButtonIoctrl()
 					CmdNew.CmdBuf[4] = ioctrl_list[nItem].p_data[1];
 					CmdNew.CmdLen = 5;
 				}
-				m_CmdList.Add(CmdNew);
+				//m_CmdList.Add(CmdNew);
+				theApp.UdsClient.push_cmd(CmdNew);
 				break;
 			}
 		}

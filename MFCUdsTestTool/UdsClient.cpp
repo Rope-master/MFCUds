@@ -7,6 +7,7 @@
 \description   uds client code, request service throngh can and deal the response
 *******************************************************************************/
 #include "stdafx.h"
+#include "UdsUtil.h"
 #include "UdsClient.h"
 #include "ControlCAN.h"
 #include "MFCUdsTestTool.h"
@@ -16,7 +17,7 @@
 /*******************************************************************************
 Type declaration
 *******************************************************************************/
-typedef struct __UDS_SERVICE_T__
+typedef struct __UDS_CLIENT_T__
 {
 	BYTE uds_sid;
 	BYTE uds_min_len;
@@ -34,12 +35,19 @@ Function  declaration
 *******************************************************************************/
 
 
+/*******************************************************************************
+Private Varaibles
+*******************************************************************************/
+
+
+/*******************************************************************************
+Class CUdsClient
+*******************************************************************************/
 CUdsClient::CUdsClient() : CUdsNetwork()
 {
 	n_Result = 0;
 	n_ResultErr = FALSE;
 }
-
 
 CUdsClient::~CUdsClient()
 {
@@ -229,6 +237,9 @@ void CUdsClient::ZTai_UDS_Send(BYTE CanData[], BYTE CanDlc)
 void CUdsClient::main_loop(void)
 {
 	network_main();
+
+	/* Handle Cmd list */
+	do_cmdlist();
 }
 
 
@@ -261,7 +272,8 @@ void CUdsClient::request(BYTE SvcId, BYTE ReqBuf[], UINT ReqLen)
 
 UINT CUdsClient::get_rsp(BYTE DataBuf[], UINT BufLen)
 {
-	/*DWORD Ticks;
+	/**
+	DWORD Ticks;
 	Ticks = GetTickCount();
 	while (GetRsp == FALSE)
 	{
@@ -283,4 +295,74 @@ UINT CUdsClient::get_rsp(BYTE DataBuf[], UINT BufLen)
 	{
 		return 0;
 	}
+}
+
+/**
+* do_cmdlist - pop cmd from cmdlist,and send the uds cmd
+*
+* @void  :
+*
+* returns:
+*     void
+*/
+void CUdsClient::do_cmdlist(void)
+{
+	BYTE DataBuf[BUF_LEN];
+	UINT readlen;
+
+	if (m_GetRsp == TRUE)
+	{
+		readlen = get_rsp(DataBuf, BUF_LEN);
+
+		if (readlen > 0)
+		{
+			m_GetRsp = FALSE;
+			if (m_CmdNow.SID == SID_27)
+			{
+				if (readlen == 6 && DataBuf[1] == 0x01)
+				{
+					m_RspBuf[0] = DataBuf[2];
+					m_RspBuf[1] = DataBuf[3];
+					m_RspBuf[2] = DataBuf[4];
+					m_RspBuf[3] = DataBuf[5];
+				}
+			}
+		}
+		else
+		{
+			m_GetRspCnt++;
+			if (m_GetRspCnt >= GETRSP_CNT)
+			{
+				m_GetRsp = FALSE;
+			}
+		}
+	}
+	else
+	{
+		INT_PTR CmdSize = m_CmdList.GetSize();
+		if (CmdSize <= 0) return;
+		m_CmdNow = m_CmdList[0];
+		m_CmdList.RemoveAt(0, 1);
+		if (m_CmdNow.SID == SID_27 && m_CmdNow.CmdBuf[0] == 0x02)
+		{
+			UdsUtil::KeyCalcu(m_RspBuf, &m_CmdNow.CmdBuf[1]);
+		}
+
+		theApp.UdsClient.request(m_CmdNow.SID, m_CmdNow.CmdBuf, m_CmdNow.CmdLen);
+		m_GetRsp = TRUE;
+		m_GetRspCnt = 0;
+	}
+}
+
+/**
+* push_cmd - push a cmd to cmdlist
+*
+* @void  :
+*
+* returns:
+*     void
+*/
+void CUdsClient::push_cmd(UdsCmd Cmd)
+{
+	m_CmdList.Add(Cmd);
 }

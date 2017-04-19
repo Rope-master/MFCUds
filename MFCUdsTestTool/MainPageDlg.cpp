@@ -10,6 +10,7 @@
 #include "UdsUtil.h"
 #include "MFCUdsTestToolDlg.h"
 
+#define DISP_TIME
 INT nextrow = 0;
 // CCanCommDlg �Ի���
 
@@ -99,6 +100,11 @@ BOOL CMainPageDlg::OnInitDialog()
 	m_RecvList.SetColumnWidth(3, 40);
 	m_RecvList.InsertColumn(4, _T("Data"));
 	m_RecvList.SetColumnWidth(4, 150);
+
+#ifdef DISP_TIME
+	m_RecvList.InsertColumn(5, _T("TimeStamp"));
+	m_RecvList.SetColumnWidth(5, 50);
+#endif
 
 #if 0
 	m_SendMsg.Create(IDD_DIALOG_SENDMSG, this);

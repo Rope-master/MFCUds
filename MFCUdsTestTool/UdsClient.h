@@ -31,6 +31,11 @@
 #define SID_31_MIN_LEN      (0x04u)
 
 
+
+#define POSITIVE_RSP 			0x40
+#define NEGATIVE_RSP 			0x7F
+#define USD_GET_POSITIVE_RSP(rsp_id)         (rsp_id - POSITIVE_RSP)
+
 #define TIMEOUT_FSA          (10000) /* 10s */
 #define TIMEOUT_S3server     (5000)  /* 5000ms */
 /* uds app layer timer */
@@ -88,6 +93,12 @@ public:
 	BYTE n_Result;
 	BOOL n_ResultErr;
 
+	CArray<UdsCmd> m_CmdList;
+	UdsCmd m_CmdNow;
+	BOOL m_GetRsp;
+	BYTE m_GetRspCnt;
+	BYTE m_RspBuf[4];
+
 private:
 	void uds_timer_start(BYTE num);
 	void uds_timer_stop(BYTE num);
@@ -103,4 +114,6 @@ public:
     void main_loop(void);
 	void request(BYTE SvcId, BYTE DidBuf[], UINT DidLen);
 	UINT get_rsp(BYTE DataBuf[], UINT BufLen);
+	void do_cmdlist(void);
+	void push_cmd(UdsCmd CmdNew);
 };
